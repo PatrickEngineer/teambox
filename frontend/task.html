@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TeamBox — Задача</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: #FFFFFF;
+            color: #000000;
+            min-height: 100vh;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 40px;
+            margin-bottom: 40px;
+        }
+
+        .logo {
+            font-size: 20px;
+            font-weight: 500;
+            letter-spacing: 2px;
+        }
+
+        .nav a {
+            color: #000000;
+            text-decoration: none;
+            margin-left: 24px;
+            font-size: 14px;
+            opacity: 0.7;
+            transition: opacity 0.2s;
+        }
+
+        .nav a:hover {
+            opacity: 0.4;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: #000000;
+            text-decoration: none;
+            opacity: 0.7;
+            font-size: 14px;
+        }
+
+        .back-link:hover {
+            opacity: 0.4;
+        }
+
+        .task-card {
+            border: 1px solid #000000;
+            padding: 24px;
+            margin-bottom: 32px;
+        }
+
+        .task-title {
+            font-size: 24px;
+            font-weight: 500;
+            margin-bottom: 16px;
+        }
+
+        .task-meta {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            margin-bottom: 16px;
+            font-size: 14px;
+        }
+
+        .task-status {
+            padding: 4px 12px;
+            border: 1px solid #000000;
+            font-size: 11px;
+            background: #FFFFFF;
+            color: #000000;
+        }
+
+        .task-priority {
+            padding: 4px 12px;
+            border: 1px solid #000000;
+            font-size: 11px;
+            background: #FFFFFF;
+            color: #000000;
+        }
+
+        .task-priority.priority-high {
+            background: #000000;
+            color: #FFFFFF;
+            border: 1px solid #000000;
+        }
+
+        .task-description {
+            font-size: 14px;
+            opacity: 0.7;
+            line-height: 1.5;
+            margin-bottom: 20px;
+            padding-top: 16px;
+        }
+
+        .task-actions {
+            display: flex;
+            gap: 20px;
+        }
+
+        .task-actions a {
+            color: #000000;
+            text-decoration: none;
+            font-size: 13px;
+            opacity: 0.7;
+        }
+
+        .task-actions a:hover {
+            opacity: 0.4;
+        }
+
+        .comments-section {
+            margin-top: 32px;
+        }
+
+        .comments-title {
+            font-size: 18px;
+            font-weight: 500;
+            margin-bottom: 20px;
+        }
+
+        .new-comment {
+            margin-bottom: 24px;
+        }
+
+        .comment-input {
+            width: 100%;
+            border: none;
+            border-bottom: 1px solid #000000;
+            padding: 12px 0;
+            font-size: 14px;
+            background: transparent;
+            outline: none;
+            resize: vertical;
+            font-family: inherit;
+        }
+
+        .comment-input:focus {
+            border-bottom-color: #000000;
+        }
+
+        .comment-submit {
+            display: inline-block;
+            margin-top: 12px;
+            color: #000000;
+            text-decoration: none;
+            font-size: 13px;
+            opacity: 0.7;
+            cursor: pointer;
+        }
+
+        .comment-submit:hover {
+            opacity: 0.4;
+        }
+
+        .comments-list {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .comment-item {
+            border: 1px solid #EEEEEE;
+            padding: 16px;
+        }
+
+        .comment-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            font-size: 13px;
+        }
+
+        .comment-author {
+            font-weight: 500;
+        }
+
+        .comment-date {
+            opacity: 0.5;
+        }
+
+        .comment-text {
+            font-size: 14px;
+            line-height: 1.5;
+            margin-bottom: 12px;
+        }
+
+        .comment-actions a {
+            color: #000000;
+            text-decoration: none;
+            font-size: 12px;
+            opacity: 0.5;
+            margin-right: 16px;
+        }
+
+        .comment-actions a:hover {
+            opacity: 0.3;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: #FFFFFF;
+            border: 1px solid #000000;
+            padding: 32px;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .modal-content h3 {
+            font-size: 20px;
+            font-weight: 500;
+            margin-bottom: 24px;
+            text-align: center;
+        }
+
+        .modal-content input, .modal-content select, .modal-content textarea {
+            width: 100%;
+            padding: 12px 0;
+            border: none;
+            border-bottom: 1px solid #000000;
+            font-size: 14px;
+            background: transparent;
+            outline: none;
+            margin-bottom: 20px;
+            font-family: inherit;
+        }
+
+        .modal-content textarea {
+            resize: vertical;
+        }
+
+        .modal-buttons {
+            display: flex;
+            justify-content: space-between;
+            gap: 16px;
+        }
+
+        .modal-buttons a {
+            flex: 1;
+            text-align: center;
+            color: #000000;
+            text-decoration: none;
+            font-size: 14px;
+            opacity: 0.7;
+            cursor: pointer;
+            padding: 8px 0;
+        }
+
+        .modal-buttons a:hover {
+            opacity: 0.4;
+        }
+
+        .message {
+            text-align: center;
+            font-size: 14px;
+            margin-bottom: 20px;
+            padding: 8px;
+        }
+
+        .error {
+            color: #000000;
+            border: 1px solid #000000;
+            background: #FFFFFF;
+        }
+
+        .success {
+            color: #000000;
+            border: 1px solid #000000;
+            background: #FFFFFF;
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                padding: 16px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo">TeamBox</div>
+        <div class="nav">
+            <a href="profile.html">профиль</a>
+            <a href="admin.html">admin</a>
+        </div>
+    </div>
+
+    <div class="container">
+        <a href="#" id="backLink" class="back-link">← назад</a>
+
+        <div id="message" class="message" style="display: none;"></div>
+
+        <div id="taskCard" class="task-card">
+            <div class="task-title" id="taskTitle">Загрузка...</div>
+            <div class="task-meta">
+                <span class="task-status" id="taskStatus">-</span>
+                <span class="task-priority" id="taskPriority">-</span>
+                <span id="taskCreatedAt"></span>
+            </div>
+            <div class="task-description" id="taskDescription"></div>
+            <div class="task-actions">
+                <a href="#" id="editTaskBtn">редактировать</a>
+            </div>
+        </div>
+
+        <div class="comments-section">
+            <div class="comments-title">КОММЕНТАРИИ</div>
+
+            <div class="new-comment">
+                <textarea id="commentText" class="comment-input" rows="2" placeholder="написать комментарий..."></textarea>
+                <a href="#" id="addCommentBtn" class="comment-submit">отправить</a>
+            </div>
+
+            <div id="commentsList" class="comments-list"></div>
+        </div>
+    </div>
+
+    <div id="editTaskModal" class="modal">
+        <div class="modal-content">
+            <h3>РЕДАКТИРОВАТЬ ЗАДАЧУ</h3>
+            <input type="text" id="editTitle" placeholder="название">
+            <textarea id="editDescription" rows="3" placeholder="описание"></textarea>
+            <select id="editStatus">
+                <option value="todo">к выполнению</option>
+                <option value="in_progress">в работе</option>
+                <option value="done">готово</option>
+            </select>
+            <select id="editPriority">
+                <option value="low">низкий</option>
+                <option value="medium">средний</option>
+                <option value="high">высокий</option>
+            </select>
+            <div class="modal-buttons">
+                <a href="#" id="cancelEditBtn">отмена</a>
+                <a href="#" id="saveEditBtn">сохранить</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:8000';
+        let taskId = null;
+        let projectId = null;
+
+        function getToken() { return localStorage.getItem('access_token'); }
+
+        function showMessage(text, isError = true) {
+            const msgDiv = document.getElementById('message');
+            msgDiv.textContent = text;
+            msgDiv.className = `message ${isError ? 'error' : 'success'}`;
+            msgDiv.style.display = 'block';
+            setTimeout(() => { msgDiv.style.display = 'none'; }, 4000);
+        }
+
+        async function apiRequest(endpoint, method = 'GET', body = null) {
+            const token = getToken();
+            const headers = { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` };
+            const config = { method, headers };
+            if (body) config.body = JSON.stringify(body);
+
+            const response = await fetch(`${API_URL}${endpoint}`, config);
+            if (response.status === 401) {
+                localStorage.removeItem('access_token');
+                localStorage.removeItem('refresh_token');
+                window.location.href = 'login.html';
+                throw new Error('Unauthorized');
+            }
+            return response;
+        }
+
+        async function loadTask() {
+            const response = await apiRequest(`/tasks/${taskId}`);
+            const task = await response.json();
+            projectId = task.project_id;
+
+            const statusMap = {
+                'todo': 'к выполнению',
+                'in_progress': 'в работе',
+                'done': 'готово'
+            };
+
+            const priorityMap = {
+                'low': 'низкий',
+                'medium': 'средний',
+                'high': 'высокий'
+            };
+
+            document.getElementById('taskTitle').textContent = task.title;
+            document.getElementById('taskStatus').textContent = statusMap[task.status] || task.status;
+            document.getElementById('taskPriority').textContent = priorityMap[task.priority] || task.priority;
+            document.getElementById('taskDescription').textContent = task.description || 'нет описания';
+            document.getElementById('taskCreatedAt').textContent = `создана: ${new Date(task.created_at).toLocaleDateString()}`;
+
+            const prioritySpan = document.getElementById('taskPriority');
+            prioritySpan.className = `task-priority priority-${task.priority}`;
+
+            document.getElementById('backLink').href = `project.html?id=${projectId}`;
+
+            document.getElementById('editTitle').value = task.title;
+            document.getElementById('editDescription').value = task.description || '';
+            document.getElementById('editStatus').value = task.status;
+            document.getElementById('editPriority').value = task.priority;
+        }
+
+        async function updateTask(title, description, status, priority) {
+            const body = {};
+            if (title) body.title = title;
+            if (description !== undefined) body.description = description || null;
+            if (status) body.status = status;
+            if (priority) body.priority = priority;
+
+            const response = await apiRequest(`/tasks/${taskId}`, 'PUT', body);
+            if (response.ok) {
+                showMessage('Задача обновлена', false);
+                closeEditModal();
+                loadTask();
+            } else {
+                const data = await response.json();
+                showMessage(data.detail || 'Ошибка обновления');
+            }
+        }
+
+        async function loadComments() {
+            try {
+                const response = await apiRequest(`/comments/task/${taskId}`);
+                const comments = await response.json();
+                const container = document.getElementById('commentsList');
+
+                if (!comments || comments.length === 0) {
+                    container.innerHTML = '';
+                    return;
+                }
+
+                container.innerHTML = comments.map(comment => {
+                    const safeText = escapeHtml(comment.text);
+                    const date = new Date(comment.created_at).toLocaleString();
+                    const authorName = comment.author_username || `Пользователь ${comment.author_id}`;
+
+                    return `
+                        <div class="comment-item" data-id="${comment.id}">
+                            <div class="comment-header">
+                                <span class="comment-author">${escapeHtml(authorName)}</span>
+                                <span class="comment-date">${date}</span>
+                            </div>
+                            <div class="comment-text">${safeText}</div>
+                            <div class="comment-actions">
+                                <a href="#" class="edit-comment" data-id="${comment.id}" data-text="${safeText}">редактировать</a>
+                                <a href="#" class="delete-comment" data-id="${comment.id}">удалить</a>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+                document.querySelectorAll('.edit-comment').forEach(btn => {
+                    btn.addEventListener('click', async (e) => {
+                        e.preventDefault();
+                        const newText = prompt('Редактировать комментарий:', btn.dataset.text);
+                        if (newText && newText.trim()) {
+                            const response = await apiRequest(`/comments/${btn.dataset.id}`, 'PUT', { text: newText.trim() });
+                            if (response.ok) {
+                                showMessage('Комментарий обновлён', false);
+                                loadComments();
+                            } else {
+                                showMessage('Ошибка обновления');
+                            }
+                        }
+                    });
+                });
+
+                document.querySelectorAll('.delete-comment').forEach(btn => {
+                    btn.addEventListener('click', async (e) => {
+                        e.preventDefault();
+                        if (confirm('Удалить комментарий?')) {
+                            const response = await apiRequest(`/comments/${btn.dataset.id}`, 'DELETE');
+                            if (response.ok) {
+                                showMessage('Комментарий удалён', false);
+                                loadComments();
+                            } else {
+                                showMessage('Ошибка удаления');
+                            }
+                        }
+                    });
+                });
+
+            } catch (error) {
+                console.error('Ошибка загрузки комментариев:', error);
+                document.getElementById('commentsList').innerHTML = '';
+            }
+        }
+
+        async function addComment(text) {
+            const response = await apiRequest(`/comments/task/${taskId}`, 'POST', { text });
+            if (response.ok) {
+                showMessage('Комментарий добавлен', false);
+                document.getElementById('commentText').value = '';
+                loadComments();
+            } else {
+                const data = await response.json();
+                showMessage(data.detail || 'Ошибка добавления');
+            }
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/[&<>]/g, function(m) {
+                if (m === '&') return '&amp;';
+                if (m === '<') return '&lt;';
+                if (m === '>') return '&gt;';
+                return m;
+            });
+        }
+
+        const editModal = document.getElementById('editTaskModal');
+        function openEditModal() { editModal.style.display = 'flex'; }
+        function closeEditModal() { editModal.style.display = 'none'; }
+
+        document.getElementById('editTaskBtn').addEventListener('click', (e) => {
+            e.preventDefault();
+            openEditModal();
+        });
+
+        document.getElementById('cancelEditBtn').addEventListener('click', (e) => {
+            e.preventDefault();
+            closeEditModal();
+        });
+
+        document.getElementById('saveEditBtn').addEventListener('click', async (e) => {
+            e.preventDefault();
+            const title = document.getElementById('editTitle').value.trim();
+            if (!title) { showMessage('Введите название задачи'); return; }
+            const description = document.getElementById('editDescription').value.trim();
+            const status = document.getElementById('editStatus').value;
+            const priority = document.getElementById('editPriority').value;
+            await updateTask(title, description, status, priority);
+        });
+
+        document.getElementById('addCommentBtn').addEventListener('click', async (e) => {
+            e.preventDefault();
+            const text = document.getElementById('commentText').value.trim();
+            if (!text) { showMessage('Введите комментарий'); return; }
+            await addComment(text);
+        });
+
+        const urlParams = new URLSearchParams(window.location.search);
+        taskId = urlParams.get('id');
+        if (!taskId) { window.location.href = 'index.html'; }
+
+        if (getToken()) {
+            loadTask();
+            loadComments();
+        } else {
+            window.location.href = 'login.html';
+        }
+
+        editModal.addEventListener('click', (e) => { if (e.target === editModal) closeEditModal(); });
+    </script>
+</body>
+</html>
