@@ -1,5 +1,7 @@
 import os
 
+from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from slowapi import Limiter, _rate_limit_exceeded_handler
@@ -28,6 +30,7 @@ limiter = Limiter(key_func=get_remote_address)
 app = FastAPI(title="TeamBox")
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+app.mount("/frontend", StaticFiles(directory="frontend"), name="frontend")
 
 
 def init_super_admin():
@@ -73,5 +76,4 @@ logger.info("All routers registered")
 
 @app.get("/")
 def root():
-    logger.debug("Root endpoint called")
-    return {"message": "TeamBox работает"}
+    return FileResponse("frontend/index.html")
