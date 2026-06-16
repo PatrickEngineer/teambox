@@ -70,7 +70,7 @@ def register(request: Request, user: UserCreate, db: Session = Depends(get_db)):
     return db_user
 
 
-@router.post("/verify-email")
+@router.get("/verify-email")
 def verify_email(token: str, db: Session = Depends(get_db)):
     email = verify_email_token(token)
     if not email:
