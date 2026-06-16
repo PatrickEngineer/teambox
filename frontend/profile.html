@@ -228,7 +228,7 @@
     </div>
 
     <script>
-        const API_URL = 'http://localhost:8000';
+        const API_URL = window.location.origin;
         let currentUser = null;
 
         function getToken() { return localStorage.getItem('access_token'); }
