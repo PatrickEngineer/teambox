@@ -1,5 +1,7 @@
 from datetime import datetime, timedelta
 
+from app.core.config import REFRESH_TOKEN_EXPIRE_DAYS, RATE_LIMIT_PER_MINUTE, EMAIL_VERIFICATION_ENABLED
+from app.core.config import REFRESH_TOKEN_EXPIRE_DAYS, RATE_LIMIT_PER_MINUTE, EMAIL_VERIFICATION_ENABLED
 from fastapi import APIRouter, Depends, HTTPException, Request
 from slowapi import Limiter
 from slowapi.util import get_remote_address
@@ -61,11 +63,16 @@ def register(request: Request, user: UserCreate, db: Session = Depends(get_db)):
         logger.warning(f"Registration failed - user already exists: {user.email}")
         raise HTTPException(status_code=400, detail="User already exists")
 
-    db_user = create_user(db, user, is_verified=False)
+    db_user = create_user(db, user, is_verified=not EMAIL_VERIFICATION_ENABLED)
     logger.info(f"User created successfully: {db_user.id} - {db_user.email}")
 
-    token = generate_email_verification_token(user.email)
-    send_verification_email(user.email, token)
+    if EMAIL_VERIFICATION_ENABLED:
+        token = generate_email_verification_token(user.email)
+        send_verification_email(user.email, token)
+        logger.info(f"Verification email sent to: {user.email}")
+    else:
+        token = generate_email_verification_token(user.email)
+        logger.info(f"Email verification disabled. Demo verification token for {user.email}: {token}")
 
     return db_user
 
