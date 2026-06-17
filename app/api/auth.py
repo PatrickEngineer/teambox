@@ -1,13 +1,11 @@
 from datetime import datetime, timedelta
 
 from app.core.config import REFRESH_TOKEN_EXPIRE_DAYS, RATE_LIMIT_PER_MINUTE, EMAIL_VERIFICATION_ENABLED
-from app.core.config import REFRESH_TOKEN_EXPIRE_DAYS, RATE_LIMIT_PER_MINUTE, EMAIL_VERIFICATION_ENABLED
 from fastapi import APIRouter, Depends, HTTPException, Request
 from slowapi import Limiter
 from slowapi.util import get_remote_address
 from sqlalchemy.orm import Session
 
-from app.core.config import REFRESH_TOKEN_EXPIRE_DAYS, RATE_LIMIT_PER_MINUTE
 from app.core.logging_config import logger
 from app.core.security import (
     create_access_token,
@@ -71,8 +69,9 @@ def register(request: Request, user: UserCreate, db: Session = Depends(get_db)):
         send_verification_email(user.email, token)
         logger.info(f"Verification email sent to: {user.email}")
     else:
-        token = generate_email_verification_token(user.email)
-        logger.info(f"Email verification disabled. Demo verification token for {user.email}: {token}")
+        logger.info(
+            f"Email verification is disabled. User created as verified: {db_user.email}"
+        )
 
     return db_user
 
